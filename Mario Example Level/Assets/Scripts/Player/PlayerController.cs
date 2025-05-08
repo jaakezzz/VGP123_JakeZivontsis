@@ -4,23 +4,22 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class PlayerController : MonoBehaviour
 {
+    //Private comps
     private Animator animator;
     private Rigidbody2D rb;
     private SpriteRenderer sprite;
     private new Collider2D collider;
-    private LayerMask isGroundLayer;
-    private Vector2 playerFeet_pos => new Vector2(collider.bounds.min.x + collider.bounds.extents.x, collider.bounds.min.y);
+    GroundCheck groundCheck;
 
+    //Modifiable props
     [Range(3, 10)]
     public float speed = 6.0f;
-
     [Range(6, 12)]
     public float jumpHeight = 8.0f;
-
     [Range(0.01f, 0.2f)]
     public float groundCheck_r = 0.02f;
 
-    public bool isGrounded;
+    //Public props
     public bool isCrouching;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -31,13 +30,17 @@ public class PlayerController : MonoBehaviour
         collider = GetComponent<Collider2D>();
         animator = GetComponent<Animator>();
 
-        isGroundLayer = LayerMask.GetMask("Ground");
+        groundCheck = new GroundCheck(LayerMask.GetMask("Ground"), collider, rb, ref groundCheck_r);
     }
 
     // Update is called once per frame
     void Update()
     {
-        CheckIsGrounded();
+        //Get current animation
+        AnimatorClipInfo[] clip_current = animator.GetCurrentAnimatorClipInfo(0);
+
+        //Update groundCheck
+        groundCheck.CheckIsGrounded();
 
         float hInput = Input.GetAxis("Horizontal");
         float vInput = Input.GetAxis("Vertical");
@@ -47,16 +50,26 @@ public class PlayerController : MonoBehaviour
             rb.linearVelocity = new Vector2(hInput * speed, rb.linearVelocity.y);
         }
 
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (Input.GetButtonDown("Jump") && groundCheck.IsGrounded)
         {
             rb.AddForce(Vector2.up * jumpHeight, ForceMode2D.Impulse);
         }
 
-        if (vInput < 0 && isGrounded)
+        if (vInput < 0 && groundCheck.IsGrounded)
         {
             isCrouching = true;
         }
         else isCrouching = false;
+
+        if (clip_current.Length > 0)
+        {
+            if (clip_current[0].clip.name != "Attack") //no anim cancel
+            {
+                rb.linearVelocity = new Vector2(hInput * speed, rb.linearVelocity.y);
+                if (Input.GetButtonDown("Fire1")) animator.SetTrigger("attack");
+            }
+            else rb.linearVelocity = Vector2.zero;
+        }
 
         //sprite flip
         if (hInput > 0 && sprite.flipX || hInput < 0 && !sprite.flipX)
@@ -66,20 +79,12 @@ public class PlayerController : MonoBehaviour
 
         animator.SetFloat("h-input", Mathf.Abs(hInput));
         animator.SetFloat("y-velocity", rb.linearVelocityY);
-        animator.SetBool("grounded", isGrounded);
+        animator.SetBool("grounded", groundCheck.IsGrounded);
         animator.SetBool("crouching", isCrouching);
     }
 
-    void CheckIsGrounded()
+    public void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!isGrounded)
-        {
-            if (rb.linearVelocityY <= 0)
-            {
-                isGrounded = Physics2D.OverlapCircle(playerFeet_pos, groundCheck_r, isGroundLayer);
-            }
-            return;
-        }
-        isGrounded = Physics2D.OverlapCircle(playerFeet_pos, groundCheck_r, isGroundLayer);
+        if(collision.gameObject.CompareTag("Pickup")) Destroy(collision.gameObject);
     }
 }
