@@ -21,6 +21,10 @@ public class PlayerController : MonoBehaviour
 
     //Public props
     public bool isCrouching;
+    public bool doublejump = false;
+    public int healthPotions = 0;
+    public int arrowCount = 0;
+    public bool[] weapons = { true, false }; // sword , bow
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -31,6 +35,9 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
 
         groundCheck = new GroundCheck(LayerMask.GetMask("Level"), collider, rb, ref groundCheck_r);
+
+        //start with sword?
+        weapons[0] = true;
     }
 
     // Update is called once per frame
@@ -52,8 +59,22 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetButtonDown("Jump") && groundCheck.IsGrounded)
         {
-            rb.linearVelocity = new Vector2(0.0f, rb.linearVelocity.y);
+            //rb.linearVelocity = new Vector2(0.0f, rb.linearVelocity.y);
             animator.SetTrigger("jump");
+        }
+
+        if (Input.GetButtonDown("Jump")
+            && (clip_current[0].clip.name == "Jump" || clip_current[0].clip.name == "JumpEnd")
+            && doublejump == true
+            && groundCheck.IsGrounded == false)
+        {
+            animator.SetTrigger("doublejump");
+            doublejump = false;
+        }
+
+        if (groundCheck.IsGrounded && doublejump == true)
+        {
+            doublejump = false;
         }
 
         if (vInput < 0 && groundCheck.IsGrounded)
@@ -62,15 +83,15 @@ public class PlayerController : MonoBehaviour
         }
         else isCrouching = false;
 
-        if (clip_current.Length > 0)
-        {
-            if (clip_current[0].clip.name != "Attack") //no anim cancel
-            {
-                rb.linearVelocity = new Vector2(hInput * speed, rb.linearVelocity.y);
-                if (Input.GetButtonDown("Fire1")) animator.SetTrigger("attack");
-            }
-            else rb.linearVelocity = Vector2.zero;
-        }
+        //if (clip_current.Length > 0)
+        //{
+        //    if (clip_current[0].clip.name != "Attack") //no anim cancel
+        //    {
+        //        rb.linearVelocity = new Vector2(hInput * speed, rb.linearVelocity.y);
+        //        if (Input.GetButtonDown("Fire1")) animator.SetTrigger("attack");
+        //    }
+        //    else rb.linearVelocity = Vector2.zero;
+        //}
 
         //sprite flip
         if (hInput > 0 && sprite.flipX || hInput < 0 && !sprite.flipX)
@@ -84,13 +105,39 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("crouching", isCrouching);
     }
 
-    public void OnCollisionEnter2D(Collision2D collision)
+    public void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Pickup")) Destroy(collision.gameObject);
+        if (collision.CompareTag("HealthPotion"))
+        {
+            Destroy(collision.gameObject);
+            healthPotions++;
+        }
+
+        if (collision.CompareTag("Bow"))
+        {
+            Destroy(collision.gameObject);
+            weapons[1] = true;
+        }
+
+        if (collision.CompareTag("Arrow"))
+        {
+            Destroy(collision.gameObject);
+            arrowCount++;
+        }
     }
 
-    void jump()
+    void Jump()
     {
         rb.AddForce(Vector2.up * jumpHeight, ForceMode2D.Impulse);
+    }
+
+    void doubleJump()
+    {
+        rb.AddForce(Vector2.up * jumpHeight/2, ForceMode2D.Impulse);
+    }
+
+    void doublejumpWindow()
+    {
+        doublejump = true;
     }
 }
