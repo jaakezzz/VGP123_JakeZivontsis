@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent (typeof(Rigidbody2D), typeof(SpriteRenderer), typeof(Collider2D))]
@@ -11,6 +13,26 @@ public class PlayerController : MonoBehaviour
     private new Collider2D collider;
     GroundCheck groundCheck;
 
+    private Coroutine speedChange = null;
+
+    public void SpeedChange()
+    {
+        if (speedChange != null)
+        {
+            StopCoroutine(speedChange);
+            speedChange = null;
+            speed /= 2.0f;
+        }
+         speedChange = StartCoroutine(SpeedChangeCoroutine());
+    }
+
+    IEnumerator SpeedChangeCoroutine()
+    {
+        speed *= 2.0f;
+        yield return new WaitForSeconds(5.0f);
+        speed /= 2.0f;
+    }
+
     //Modifiable props
     [Range(3, 10)]
     public float speed = 6.0f;
@@ -19,8 +41,56 @@ public class PlayerController : MonoBehaviour
     [Range(0.01f, 0.2f)]
     public float groundCheck_r = 0.02f;
 
-    //Public props
+    //props
     public bool isCrouching;
+
+    public int score = 0;
+
+    private int lives = 3;
+    public int Lives
+    {
+        get { return lives; }
+        set
+        {
+            if (value < 0)
+            {
+                GameOver();
+            }
+            if (lives > value)
+            {
+                Respawn();
+            }
+            lives = value;
+            Debug.Log("Lives: " + lives);
+        }
+    }
+    public int GetLives()
+    {
+        return lives;
+    }
+
+    public void SetLives(int value)
+    {
+        if (value < 0)
+        {
+            GameOver();
+        }
+        if (lives > value)
+        {
+            Respawn();
+        }
+        lives = value;
+    }
+
+    private void Respawn()
+    {
+        Debug.Log("Respawn");
+    }
+
+    private void GameOver()
+    {
+        Debug.Log("Game Over");
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -63,7 +133,7 @@ public class PlayerController : MonoBehaviour
 
         if (clip_current.Length > 0)
         {
-            if (clip_current[0].clip.name != "Attack") //no anim cancel
+            if (clip_current[0].clip.name != "Attack" && !isCrouching) //no anim cancel
             {
                 rb.linearVelocity = new Vector2(hInput * speed, rb.linearVelocity.y);
                 if (Input.GetButtonDown("Fire1")) animator.SetTrigger("attack");
@@ -81,10 +151,5 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("y-velocity", rb.linearVelocityY);
         animator.SetBool("grounded", groundCheck.IsGrounded);
         animator.SetBool("crouching", isCrouching);
-    }
-
-    public void OnCollisionEnter2D(Collision2D collision)
-    {
-        if(collision.gameObject.CompareTag("Pickup")) Destroy(collision.gameObject);
     }
 }
