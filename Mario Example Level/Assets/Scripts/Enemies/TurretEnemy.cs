@@ -1,10 +1,10 @@
 using UnityEngine;
-using UnityEngine.U2D;
 
 [RequireComponent(typeof(Shoot))]
 public class TurretEnemy : Enemy
 {
     [SerializeField] public float cooldown = 2.0f;
+    [SerializeField] public float range = 10f;
     private float timeSinceLastFire = 0;
     private Transform player;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -24,19 +24,14 @@ public class TurretEnemy : Enemy
 
         if (stateInfo.IsName("Idle")) CheckFire();
 
-        if (player.position.x < transform.position.x)
-        {
-            spriteRenderer.flipX = true;
-        }
-        else
-        {
-            spriteRenderer.flipX = false;
-        }
+        spriteRenderer.flipX = player.position.x < transform.position.x;
     }
 
     void CheckFire()
     {
-        if (Time.time >= timeSinceLastFire + cooldown)
+        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+
+        if (distanceToPlayer <= range && Time.time >= timeSinceLastFire + cooldown)
         {
             animator.SetTrigger("attack");
             timeSinceLastFire = Time.time;
