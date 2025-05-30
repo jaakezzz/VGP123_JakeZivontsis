@@ -152,4 +152,15 @@ public class PlayerController : MonoBehaviour
         animator.SetBool("grounded", groundCheck.IsGrounded);
         animator.SetBool("crouching", isCrouching);
     }
+
+    public void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Squish") && rb.linearVelocityY < 0)
+        {
+            collision.enabled = false;
+            collision.gameObject.GetComponentInParent<Enemy>().TakeDamage(100, DamageType.JumpedOn);
+            rb.linearVelocity = Vector2.zero;
+            rb.AddForce(Vector2.up * jumpHeight, ForceMode2D.Impulse);
+        }
+    }
 }
