@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
@@ -5,7 +6,18 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] private float minX;
     [SerializeField] private float maxX;
 
-    public Transform player; // Reference to the player's transform
+    private Transform player; // Reference to the player's transform
+
+    private void Awake()
+    {
+        GameManager.Instance.OnPlayerControllerCreated += SetPlayerRef;
+    }
+
+    private PlayerController SetPlayerRef(PlayerController playerInstance)
+    {
+        player = playerInstance.transform;
+        return playerInstance;
+    }
 
     void Update()
     {

@@ -46,52 +46,6 @@ public class PlayerController : MonoBehaviour
 
     public int score = 0;
 
-    private int lives = 3;
-    public int Lives
-    {
-        get { return lives; }
-        set
-        {
-            if (value < 0)
-            {
-                GameOver();
-            }
-            if (lives > value)
-            {
-                Respawn();
-            }
-            lives = value;
-            Debug.Log("Lives: " + lives);
-        }
-    }
-    public int GetLives()
-    {
-        return lives;
-    }
-
-    public void SetLives(int value)
-    {
-        if (value < 0)
-        {
-            GameOver();
-        }
-        if (lives > value)
-        {
-            Respawn();
-        }
-        lives = value;
-    }
-
-    private void Respawn()
-    {
-        Debug.Log("Respawn");
-    }
-
-    private void GameOver()
-    {
-        Debug.Log("Game Over");
-    }
-
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -161,6 +115,10 @@ public class PlayerController : MonoBehaviour
             collision.gameObject.GetComponentInParent<Enemy>().TakeDamage(100, DamageType.JumpedOn);
             rb.linearVelocity = Vector2.zero;
             rb.AddForce(Vector2.up * jumpHeight, ForceMode2D.Impulse);
+        }
+        if (collision.CompareTag("Death"))
+        {
+            GameManager.Instance.Lives--;
         }
     }
 }

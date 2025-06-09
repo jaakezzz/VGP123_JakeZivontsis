@@ -20,7 +20,7 @@ public class Pickup : MonoBehaviour
             switch (pickupType)
             {
                 case PickupType.Life:
-                    pc.Lives++;
+                    GameManager.Instance.Lives++;
                     break;
                 case PickupType.Powerup:
                     pc.SpeedChange();
@@ -43,7 +43,7 @@ public class Pickup : MonoBehaviour
             switch (pickupType)
             {
                 case PickupType.Life:
-                    pc.Lives++;
+                    GameManager.Instance.Lives++;
                     break;
                 case PickupType.Powerup:
                     pc.SpeedChange();

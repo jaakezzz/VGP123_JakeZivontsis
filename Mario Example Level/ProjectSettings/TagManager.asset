@@ -8,6 +8,7 @@ TagManager:
   - Pickup
   - Barrier
   - Squish
+  - Death
   layers:
   - Default
   - TransparentFX
