@@ -1,10 +1,14 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Events;
 
 public class GameManager : MonoBehaviour
 {
     public delegate PlayerController PlayerControllerDelegate(PlayerController playerInstance);
     public event PlayerControllerDelegate OnPlayerControllerCreated;
+
+    public UnityEvent<int> OnLivesChanged;
 
     #region Singleton Pattern
     private static GameManager _instance;
@@ -44,6 +48,7 @@ public class GameManager : MonoBehaviour
                 Respawn();
             }
             lives = value;
+            OnLivesChanged?.Invoke(lives);
             Debug.Log("Lives: " + lives);
         }
     }
@@ -58,17 +63,17 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (SceneManager.GetActiveScene().name == "Title")
-            {
-                SceneManager.LoadScene("SampleScene");
-                //Reset Game
-                Lives = 3;
-            }
-            else
-                SceneManager.LoadScene("Title");
-        }
+        //if (Input.GetKeyDown(KeyCode.Escape))
+        //{
+        //    if (SceneManager.GetActiveScene().name == "Title")
+        //    {
+        //        SceneManager.LoadScene("SampleScene");
+        //        //Reset Game
+        //        Lives = 3;
+        //    }
+        //    else
+        //        SceneManager.LoadScene("Title");
+        //}
     }
 
     private void Respawn()
