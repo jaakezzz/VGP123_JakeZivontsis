@@ -90,7 +90,7 @@ public class PlayerController : MonoBehaviour
             if (clip_current[0].clip.name != "Attack" && !isCrouching) //no anim cancel
             {
                 rb.linearVelocity = new Vector2(hInput * speed, rb.linearVelocity.y);
-                if (Input.GetButtonDown("Fire1")) animator.SetTrigger("attack");
+                if (Input.GetButtonDown("Fire1") && Time.timeScale > 0) animator.SetTrigger("attack");
             }
             else rb.linearVelocity = Vector2.zero;
         }
