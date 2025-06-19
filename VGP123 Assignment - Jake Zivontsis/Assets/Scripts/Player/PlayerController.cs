@@ -111,7 +111,7 @@ public class PlayerController : MonoBehaviour
             {
                 combo = false;
                 animator.SetBool("attacking", false);
-                rb.linearVelocity = new Vector2(hInput * speed, rb.linearVelocity.y);
+                if (!isCrouching) rb.linearVelocity = new Vector2(hInput * speed, rb.linearVelocity.y);
                 if (Input.GetButtonDown("Fire1"))
                 {
                     animator.SetTrigger("attack");

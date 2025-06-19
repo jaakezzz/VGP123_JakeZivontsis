@@ -30,6 +30,8 @@ public class Shoot : MonoBehaviour
     public void Fire()
     {
         Projectile projectile;
+        Vector3 scale = Vector3.one;
+
         if (!sr.flipX)
         {
             projectile = Instantiate(projectilePrefab, spawnpointRight.position, Quaternion.identity);
@@ -39,6 +41,9 @@ public class Shoot : MonoBehaviour
         {
             projectile = Instantiate(projectilePrefab, spawnpointLeft.position, Quaternion.identity);
             projectile.setProjSpeed(new Vector2(-projSpeed.x, projSpeed.y));
+
+            scale.x = -1;
+            projectile.transform.localScale = scale;
         }
     }
 

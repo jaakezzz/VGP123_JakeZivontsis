@@ -8,6 +8,7 @@ public class Projectile : MonoBehaviour
     [SerializeField] private ProjectileType type;
     [SerializeField, Range(1, 20)] private float duration = 1.0f;
     [SerializeField] private int damage = 1;
+    [SerializeField] private bool explosive = false;
 
     private Animator animator;
     private Rigidbody2D rb;
@@ -59,6 +60,10 @@ public class Projectile : MonoBehaviour
             {
                 GameManager.Instance.PlayerHealth -= damage;
                 Explode();
+            }
+            else
+            {
+                if (explosive == true) Explode();
             }
         }
     }
