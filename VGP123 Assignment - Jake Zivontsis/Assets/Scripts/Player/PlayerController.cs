@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(SpriteRenderer), typeof(Collider2D))]
@@ -11,6 +13,8 @@ public class PlayerController : MonoBehaviour
     private new Collider2D collider;
     GroundCheck groundCheck;
 
+    private HashSet<GameObject> enemiesHitThisSwing = new HashSet<GameObject>();
+
     //Modifiable props
     [Range(3, 10)]
     public float speed = 6.0f;
@@ -22,9 +26,13 @@ public class PlayerController : MonoBehaviour
     //Public props
     public bool isCrouching;
     public bool doublejump = false;
+    public bool combo = false;
     public int healthPotions = 0;
     public int arrowCount = 0;
     public bool[] weapons = { true, false }; // sword , bow
+    [SerializeField] private Collider2D hitbox1;
+    [SerializeField] private Collider2D hitbox2;
+    [SerializeField] private Collider2D hitbox3;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -43,8 +51,22 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        if (weapons[0] == true) animator.SetBool("sword", true);
+
         //Get current animation
         AnimatorClipInfo[] clip_current = animator.GetCurrentAnimatorClipInfo(0);
+
+        if (clip_current[0].clip.name == "death") return;
+
+        if (clip_current.Length > 0)
+        {
+            string clipName = clip_current[0].clip.name;
+
+            if (clipName == "sword1") CheckHitbox(hitbox1);
+            else if (clipName == "sword2") CheckHitbox(hitbox2);
+            else if (clipName == "sword3") CheckHitbox(hitbox3);
+        }
 
         //Update groundCheck
         groundCheck.CheckIsGrounded();
@@ -83,20 +105,39 @@ public class PlayerController : MonoBehaviour
         }
         else isCrouching = false;
 
-        //if (clip_current.Length > 0)
-        //{
-        //    if (clip_current[0].clip.name != "Attack") //no anim cancel
-        //    {
-        //        rb.linearVelocity = new Vector2(hInput * speed, rb.linearVelocity.y);
-        //        if (Input.GetButtonDown("Fire1")) animator.SetTrigger("attack");
-        //    }
-        //    else rb.linearVelocity = Vector2.zero;
-        //}
+        if (clip_current.Length > 0)
+        {
+            if (clip_current[0].clip.name != "sword1" && clip_current[0].clip.name != "sword2" && clip_current[0].clip.name != "sword3") 
+            {
+                combo = false;
+                animator.SetBool("attacking", false);
+                rb.linearVelocity = new Vector2(hInput * speed, rb.linearVelocity.y);
+                if (Input.GetButtonDown("Fire1"))
+                {
+                    animator.SetTrigger("attack");
+                    animator.SetBool("attacking", true);
+                }
+                enemiesHitThisSwing.Clear();
+            }
+            else rb.linearVelocity = Vector2.zero;
+        }
+
+        if (clip_current[0].clip.name == "sword1" || clip_current[0].clip.name == "sword2")
+        {
+            if (Input.GetButtonDown("Fire1")) combo = true;
+        }
 
         //sprite flip
-        if (hInput > 0 && sprite.flipX || hInput < 0 && !sprite.flipX)
+        //if (hInput > 0 && sprite.flipX || hInput < 0 && !sprite.flipX)
+        //{
+        //    sprite.flipX = !sprite.flipX;
+        //}
+        //tranform flip
+        if (hInput > 0 && transform.localScale.x < 0 || hInput < 0 && transform.localScale.x > 0)
         {
-            sprite.flipX = !sprite.flipX;
+            Vector3 scale = transform.localScale;
+            scale.x *= -1;
+            transform.localScale = scale;
         }
 
         animator.SetFloat("h-input", Mathf.Abs(hInput));
@@ -139,5 +180,57 @@ public class PlayerController : MonoBehaviour
     void doublejumpWindow()
     {
         doublejump = true;
+    }
+
+    void comboAttack()
+    {
+        if (combo == true)
+        {
+            animator.SetBool("attacking", true);
+            animator.SetTrigger("attack");
+            combo = false;
+        }
+    }
+
+    void clearHitList()
+    {
+        enemiesHitThisSwing.Clear();
+    }
+
+    void comboWindow()
+    {
+        combo = true;
+    }
+
+    void CheckHitbox(Collider2D hitbox)
+    {
+        ContactFilter2D filter = new ContactFilter2D().NoFilter();
+        List<Collider2D> results = new List<Collider2D>();
+
+        int hits = Physics2D.OverlapCollider(hitbox, filter, results);
+
+        for (int i = 0; i < hits; i++)
+        {
+            GameObject enemy = results[i].gameObject;
+
+            if (enemy.CompareTag("Enemy") && !enemiesHitThisSwing.Contains(enemy))
+            {
+                enemiesHitThisSwing.Add(enemy);
+                Debug.Log("Hit enemy: " + enemy.name);
+                enemy.GetComponent<Enemy>().TakeDamage(1);
+            }
+        }
+    }
+
+    public void DieAndRespawn(float delay)
+    {
+        animator.SetTrigger("death");
+        StartCoroutine(RespawnAfterDelay(delay));
+    }
+
+    private IEnumerator RespawnAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        GameManager.Instance.FinishRespawn();
     }
 }

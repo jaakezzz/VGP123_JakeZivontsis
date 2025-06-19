@@ -7,6 +7,17 @@ public class CameraFollow : MonoBehaviour
 
     public Transform player; // Reference to the player's transform
 
+    private void Awake()
+    {
+        GameManager.Instance.OnPlayerControllerCreated += SetPlayerRef;
+    }
+
+    private PlayerController SetPlayerRef(PlayerController playerInstance)
+    {
+        player = playerInstance.transform;
+        return playerInstance;
+    }
+
     void Update()
     {
         if (player == null) return;
@@ -21,7 +32,7 @@ public class CameraFollow : MonoBehaviour
         }
         else pos.y = 1.25f;
 
-        if (player.position.y < -15f)
+        if (player.position.y < -14f)
         {
             pos.y = -17.8f;
         }
