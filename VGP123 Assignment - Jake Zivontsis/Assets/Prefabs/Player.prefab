@@ -170,6 +170,7 @@ GameObject:
   - component: {fileID: 4579847063848142189}
   - component: {fileID: 5700389347167813028}
   - component: {fileID: 1083331313439279927}
+  - component: {fileID: 5826281477275960259}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -311,6 +312,14 @@ MonoBehaviour:
   speed: 6
   jumpHeight: 8
   groundCheck_r: 0.08
+  sword1: {fileID: 8300000, guid: dacbb128c33ee8644b30a5ab8ce14474, type: 3}
+  sword2: {fileID: 8300000, guid: 176d1ed512a419e49aa69c6151cb509a, type: 3}
+  sword3: {fileID: 8300000, guid: 143376f564475e0478632ecaaa2c1a99, type: 3}
+  swordHit: {fileID: 8300000, guid: a3ff87afd353ab54f8c8524a7fc99dbe, type: 3}
+  grunt: {fileID: 8300000, guid: 9bb2ee6c109f72c488c62245bf6f4091, type: 3}
+  deathCry: {fileID: 8300000, guid: c237d009678beee49b8615f3b55218b5, type: 3}
+  potionPickup: {fileID: 8300000, guid: 21eab9b3e5bf8df439647b600860999d, type: 3}
+  potionDrink: {fileID: 8300000, guid: adab44caf8ff43b4c8300669c6770790, type: 3}
   isCrouching: 0
   doublejump: 0
   combo: 0
@@ -320,6 +329,7 @@ MonoBehaviour:
   hitbox1: {fileID: 502497188699895112}
   hitbox2: {fileID: 6213241019731077974}
   hitbox3: {fileID: 1603275119145551104}
+  canvasManager: {fileID: 0}
 --- !u!50 &5700389347167813028
 Rigidbody2D:
   serializedVersion: 5
@@ -369,6 +379,103 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!82 &5826281477275960259
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5112919599346959024}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &7952892630016356167
 GameObject:
   m_ObjectHideFlags: 0

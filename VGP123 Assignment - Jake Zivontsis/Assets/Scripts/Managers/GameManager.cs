@@ -41,14 +41,15 @@ public class GameManager : MonoBehaviour
         get { return playerHealth; }
         set
         {
+            int prevHealth = playerHealth;
             playerHealth = value;
             if (value <= 0)
             {
                 Respawn();
             }
-            if (playerHealth > value)
+            if (playerHealth < prevHealth)
             {
-                // play hurt sound
+                playerInstance.hurtSound();
             }
             OnHealthChanged?.Invoke(playerHealth);
             if (canvasManager != null)

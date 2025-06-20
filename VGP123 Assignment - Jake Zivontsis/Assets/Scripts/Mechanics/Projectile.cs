@@ -10,8 +10,11 @@ public class Projectile : MonoBehaviour
     [SerializeField] private int damage = 1;
     [SerializeField] private bool explosive = false;
 
+    public AudioClip explosion;
+
     private Animator animator;
     private Rigidbody2D rb;
+    private AudioSource audioSource;
 
     private bool hasExploded = false;
 
@@ -19,6 +22,7 @@ public class Projectile : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -73,6 +77,7 @@ public class Projectile : MonoBehaviour
         hasExploded = true;
 
         animator.SetTrigger("explode");
+        audioSource.PlayOneShot(explosion);
 
         // Stop all physics movement
         rb.linearVelocity = Vector2.zero;

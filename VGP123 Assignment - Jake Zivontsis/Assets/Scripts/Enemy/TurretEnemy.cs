@@ -3,10 +3,16 @@ using UnityEngine;
 [RequireComponent(typeof(Shoot))]
 public class TurretEnemy : Enemy
 {
+    private AudioSource audioSource;
+
+    [Header("Turret Stats")]
     [SerializeField] public float cooldown = 2.0f;
     [SerializeField] public float range = 10f;
     private float timeSinceLastFire = 0;
     private Transform player;
+
+    [Header("Audio")]
+    public AudioClip laugh;
 
     //private void Awake()
     //{
@@ -32,6 +38,8 @@ public class TurretEnemy : Enemy
         }
 
         if (cooldown <= 0) cooldown = 2;
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -52,6 +60,7 @@ public class TurretEnemy : Enemy
         if (distanceToPlayer <= range && Time.time >= timeSinceLastFire + cooldown)
         {
             animator.SetTrigger("attack");
+            audioSource.PlayOneShot(laugh);
             timeSinceLastFire = Time.time;
         }
     }

@@ -9,6 +9,7 @@ public class CanvasManager : MonoBehaviour
     [Header("Buttons and Sliders")]
     public Button playBtn;
     public Button settingsBtn;
+    public Button creditsBtn;
     public Button quitBtn;
     public Button backBtn;
     public Button mainMenuBtn;
@@ -17,6 +18,7 @@ public class CanvasManager : MonoBehaviour
     [Header("Menu Canvases")]
     public GameObject mainMenuCanvas;
     public GameObject settingsCanvas;
+    public GameObject creditsCanvas;
     public GameObject pauseMenuCanvas;
     public GameObject HUDCanvas;
     public GameObject WinCanvas;
@@ -37,19 +39,8 @@ public class CanvasManager : MonoBehaviour
         if (playBtn) playBtn.onClick.AddListener(() => ChangeScene("SampleScene"));
         if (quitBtn) quitBtn.onClick.AddListener(QuitGame);
         if (settingsBtn) settingsBtn.onClick.AddListener(() => SetMenus(settingsCanvas, mainMenuCanvas));
-        if (backBtn)
-        {
-            if (SceneManager.GetActiveScene().name == "SampleScene")
-            {
-                backBtn.onClick.AddListener(() =>
-                {
-                    SetMenus(HUDCanvas, pauseMenuCanvas);
-                    Time.timeScale = 1.0f;
-                });
-            }
-            else
-                backBtn.onClick.AddListener(() => SetMenus(mainMenuCanvas, settingsCanvas));
-        }
+        if (creditsBtn) creditsBtn.onClick.AddListener(() => SetMenus(creditsCanvas, mainMenuCanvas));
+        if (backBtn) backBtn.onClick.AddListener(backButton);
         if (mainMenuBtn) mainMenuBtn.onClick.AddListener(ReturnToMenu);
 
         if (volSlider)
@@ -125,6 +116,20 @@ public class CanvasManager : MonoBehaviour
     {
         ChangeScene("Title");
         Time.timeScale = 1.0f;
+    }
+
+    public void backButton()
+    {
+        if (SceneManager.GetActiveScene().name == "SampleScene")
+        {
+                SetMenus(HUDCanvas, pauseMenuCanvas);
+                Time.timeScale = 1.0f;
+        }
+        else
+        {
+                SetMenus(mainMenuCanvas, settingsCanvas);
+                SetMenus(null, creditsCanvas);
+        }
     }
 
 }

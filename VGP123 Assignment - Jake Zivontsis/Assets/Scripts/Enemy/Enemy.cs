@@ -21,9 +21,13 @@ public class Enemy : MonoBehaviour
     protected bool isDead = false;
     public bool IsDead => isDead;
 
+    [Header("Audio")]
+    public AudioClip deathCry;
+
     // Components
     protected Animator animator;
     protected SpriteRenderer spriteRenderer;
+    private AudioSource audioSource;
     public SpriteRenderer Sprite => spriteRenderer;
 
     protected virtual void OnEnable()
@@ -40,6 +44,7 @@ public class Enemy : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        audioSource = GetComponent<AudioSource>();
         currentHealth = maxHealth;
     }
 
@@ -76,7 +81,8 @@ public class Enemy : MonoBehaviour
             Debug.Log($"{gameObject.name} destroyed wall: {checkpointWall.name}");
         }
 
-        // Optionally trigger animation or disable components
+        animator.SetTrigger("death");
+        audioSource.PlayOneShot(deathCry);
         Destroy(gameObject, 0.4f); // Replace with animation/poof later
     }
 

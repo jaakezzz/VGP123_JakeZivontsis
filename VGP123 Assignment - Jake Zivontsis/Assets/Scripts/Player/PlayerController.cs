@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     private SpriteRenderer sprite;
     private new Collider2D collider;
     GroundCheck groundCheck;
+    private AudioSource audioSource;
 
     private HashSet<GameObject> enemiesHitThisSwing = new HashSet<GameObject>();
 
@@ -24,16 +25,32 @@ public class PlayerController : MonoBehaviour
     public float groundCheck_r = 0.02f;
 
     //Public props
+    [Header("Audio")]
+    public AudioClip sword1;
+    public AudioClip sword2;
+    public AudioClip sword3;
+    public AudioClip swordHit;
+    public AudioClip grunt;
+    public AudioClip deathCry;
+    public AudioClip potionPickup;
+    public AudioClip potionDrink;
+
+    [Header("Behaviours")]
     public bool isCrouching;
     public bool doublejump = false;
     public bool combo = false;
+
+    [Header("Inventory")]
     public int healthPotions = 0;
     public int arrowCount = 0;
     public bool[] weapons = { true, false }; // sword , bow
+
+    [Header("Sword Hitboxes")]
     [SerializeField] private Collider2D hitbox1;
     [SerializeField] private Collider2D hitbox2;
     [SerializeField] private Collider2D hitbox3;
 
+    [Header("Canvas Manager Ref")]
     [SerializeField] private CanvasManager canvasManager;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -43,6 +60,7 @@ public class PlayerController : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
         collider = GetComponent<Collider2D>();
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
 
         groundCheck = new GroundCheck(LayerMask.GetMask("Level"), collider, rb, ref groundCheck_r);
 
@@ -61,15 +79,6 @@ public class PlayerController : MonoBehaviour
         AnimatorClipInfo[] clip_current = animator.GetCurrentAnimatorClipInfo(0);
 
         if (clip_current[0].clip.name == "death") return;
-
-        if (clip_current.Length > 0)
-        {
-            string clipName = clip_current[0].clip.name;
-
-            if (clipName == "sword1") CheckHitbox(hitbox1);
-            else if (clipName == "sword2") CheckHitbox(hitbox2);
-            else if (clipName == "sword3") CheckHitbox(hitbox3);
-        }
 
         //Update groundCheck
         groundCheck.CheckIsGrounded();
@@ -149,6 +158,7 @@ public class PlayerController : MonoBehaviour
             {
                 healthPotions--;
                 GameManager.Instance.PlayerHealth = 3;
+                audioSource.PlayOneShot(potionDrink, 2.0f);
                 if (canvasManager != null)
                     canvasManager.healthPotionsText.text = $"x{healthPotions}";
             }
@@ -166,6 +176,7 @@ public class PlayerController : MonoBehaviour
         {
             Destroy(collision.gameObject);
             healthPotions++;
+            audioSource.PlayOneShot(potionPickup, 2.5f);
             if (canvasManager != null)
                 canvasManager.healthPotionsText.text = $"x{healthPotions}";
         }
@@ -231,12 +242,41 @@ public class PlayerController : MonoBehaviour
         combo = true;
     }
 
-    void CheckHitbox(Collider2D hitbox)
+    void attackSound()
     {
+        AnimatorClipInfo[] clip_current = animator.GetCurrentAnimatorClipInfo(0);
+        if (clip_current[0].clip.name == "sword1") audioSource.PlayOneShot(sword1);
+        if (clip_current[0].clip.name == "sword2") audioSource.PlayOneShot(sword2);
+        if (clip_current[0].clip.name == "sword3") audioSource.PlayOneShot(sword3);
+    }
+
+    public void hurtSound()
+    {
+        audioSource.PlayOneShot(grunt, 16.0f);
+        //Debug.Log("Hurt sound played.");
+    }
+
+    public void CheckHitbox()
+    {
+        AnimatorClipInfo[] clip_current = animator.GetCurrentAnimatorClipInfo(0);
+
+        if (clip_current.Length == 0)
+            return;
+
+        string clipName = clip_current[0].clip.name;
+        Collider2D selectedHitbox = null;
+
+        if (clipName == "sword1") selectedHitbox = hitbox1;
+        else if (clipName == "sword2") selectedHitbox = hitbox2;
+        else if (clipName == "sword3") selectedHitbox = hitbox3;
+
+        if (selectedHitbox == null)
+            return;
+
         ContactFilter2D filter = new ContactFilter2D().NoFilter();
         List<Collider2D> results = new List<Collider2D>();
 
-        int hits = Physics2D.OverlapCollider(hitbox, filter, results);
+        int hits = Physics2D.OverlapCollider(selectedHitbox, filter, results);
 
         for (int i = 0; i < hits; i++)
         {
@@ -247,6 +287,7 @@ public class PlayerController : MonoBehaviour
                 enemiesHitThisSwing.Add(enemy);
                 Debug.Log("Hit enemy: " + enemy.name);
                 enemy.GetComponent<Enemy>().TakeDamage(1);
+                audioSource.PlayOneShot(swordHit, 0.6f);
             }
         }
     }
@@ -254,6 +295,7 @@ public class PlayerController : MonoBehaviour
     public void DieAndRespawn(float delay)
     {
         animator.SetTrigger("death");
+        audioSource.PlayOneShot(deathCry, 4.0f);
         StartCoroutine(RespawnAfterDelay(delay));
     }
 
