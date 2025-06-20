@@ -210,7 +210,7 @@ MonoBehaviour:
   moveSpeed: 2
   checkpointOnDeath: {fileID: 0}
   checkpointWall: {fileID: 0}
-  deathCry: {fileID: 8300000, guid: 1aeb4bca0beb6114db079809c2ac06b9, type: 3}
+  deathCry: {fileID: 8300000, guid: cb6774882f4878c4498206c8e6a22a66, type: 3}
 --- !u!114 &8724904017235484420
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -256,7 +256,7 @@ AudioSource:
   m_GameObject: {fileID: 2134239082474568705}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 4537119725311884224, guid: b61c3541fc44fb94d83e15986fef9986, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1

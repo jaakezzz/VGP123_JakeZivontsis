@@ -197,6 +197,7 @@ public class PlayerController : MonoBehaviour
         {
             if (canvasManager != null)
             {
+                audioSource.PlayOneShot(potionDrink);
                 canvasManager.ShowWinScreen();
                 Time.timeScale = 0f;
             }

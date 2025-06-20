@@ -3,9 +3,13 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.Audio;
+using Unity.VisualScripting;
 
 public class CanvasManager : MonoBehaviour
 {
+    public AudioMixer audioMixer;
+
     [Header("Buttons and Sliders")]
     public Button playBtn;
     public Button settingsBtn;
@@ -13,7 +17,9 @@ public class CanvasManager : MonoBehaviour
     public Button quitBtn;
     public Button backBtn;
     public Button mainMenuBtn;
-    public Slider volSlider;
+    public Slider masterVolSlider;
+    public Slider musicVolSlider;
+    public Slider sfxVolSlider;
 
     [Header("Menu Canvases")]
     public GameObject mainMenuCanvas;
@@ -24,7 +30,9 @@ public class CanvasManager : MonoBehaviour
     public GameObject WinCanvas;
 
     [Header("Text")]
-    public TMP_Text volSliderText;
+    public TMP_Text masterVolSliderText;
+    public TMP_Text musicVolSliderText;
+    public TMP_Text sfxVolSliderText;
     public TMP_Text healthText;
     public TMP_Text healthPotionsText;
 
@@ -36,6 +44,10 @@ public class CanvasManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        InitializeSlider(masterVolSlider, masterVolSliderText, "MasterVolume", 0.75f);
+        InitializeSlider(musicVolSlider, musicVolSliderText, "MusicVolume", 0.75f);
+        InitializeSlider(sfxVolSlider, sfxVolSliderText, "SFXVolume", 0.75f);
+
         if (playBtn) playBtn.onClick.AddListener(() => ChangeScene("SampleScene"));
         if (quitBtn) quitBtn.onClick.AddListener(QuitGame);
         if (settingsBtn) settingsBtn.onClick.AddListener(() => SetMenus(settingsCanvas, mainMenuCanvas));
@@ -43,14 +55,35 @@ public class CanvasManager : MonoBehaviour
         if (backBtn) backBtn.onClick.AddListener(backButton);
         if (mainMenuBtn) mainMenuBtn.onClick.AddListener(ReturnToMenu);
 
-        if (volSlider)
-        {
-            volSlider.onValueChanged.AddListener((value) => 
-            {
-                float roundedValue = Mathf.Round(value * 100);
-                if (volSliderText) volSliderText.text = $"{roundedValue}%";
-            });
-        }
+        //if (masterVolSlider)
+        //{
+        //    SetupSliderInformation(masterVolSlider, masterVolSliderText, "MasterVolume");
+        //    OnSliderValueChanged(masterVolSlider.value, masterVolSlider, masterVolSliderText, "MasterVolume");
+        //}
+        //if (musicVolSlider)
+        //{
+        //    SetupSliderInformation(musicVolSlider, musicVolSliderText, "MusicVolume");
+        //    OnSliderValueChanged(musicVolSlider.value, musicVolSlider, musicVolSliderText, "MusicVolume");
+        //}
+        //if (sfxVolSlider)
+        //{
+        //    SetupSliderInformation(sfxVolSlider, sfxVolSliderText, "SFXVolume");
+        //    OnSliderValueChanged(sfxVolSlider.value, sfxVolSlider, sfxVolSliderText, "SFXVolume");
+        //}
+    }
+
+    private void SetupSliderInformation(Slider slider, TMP_Text sliderText, string parameterName)
+    {
+        slider.onValueChanged.AddListener((value) => OnSliderValueChanged(value, slider, sliderText, parameterName));
+    }
+
+    private void OnSliderValueChanged(float value, Slider slider, TMP_Text sliderText, string parameterName)
+    {
+        value = (value == 0) ? -80 : Mathf.Log10(slider.value) * 20;
+        sliderText.text = (value == -80) ? "0%" : $"{(int)(slider.value * 100)}%";
+        audioMixer.SetFloat(parameterName, value);
+
+        //PlayerPrefs.SetFloat(parameterName + "_SliderValue", value);
     }
 
     // Update is called once per frame
@@ -130,6 +163,30 @@ public class CanvasManager : MonoBehaviour
                 SetMenus(mainMenuCanvas, settingsCanvas);
                 SetMenus(null, creditsCanvas);
         }
+    }
+
+    private void InitializeSlider(Slider slider, TMP_Text sliderText, string parameterName, float defaultValue)
+    {
+        if (slider == null) return;
+
+        float savedValue = PlayerPrefs.GetFloat(parameterName + "_SliderValue", defaultValue);
+
+        slider.onValueChanged.RemoveAllListeners();
+
+        slider.value = savedValue;
+
+        ApplyVolumeSetting(savedValue, slider, sliderText, parameterName);
+
+        slider.onValueChanged.AddListener((value) => ApplyVolumeSetting(value, slider, sliderText, parameterName));
+    }
+
+    private void ApplyVolumeSetting(float value, Slider slider, TMP_Text sliderText, string parameterName)
+    {
+        float dbValue = (value == 0f) ? -80f : Mathf.Log10(value) * 20f;
+        sliderText.text = (value == 0f) ? "0%" : $"{(int)(value * 100)}%";
+        audioMixer.SetFloat(parameterName, dbValue);
+        PlayerPrefs.SetFloat(parameterName + "_SliderValue", value);
+        PlayerPrefs.Save(); // Ensure it’s written to disk
     }
 
 }

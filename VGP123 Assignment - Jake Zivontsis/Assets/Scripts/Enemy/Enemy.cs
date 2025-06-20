@@ -83,7 +83,7 @@ public class Enemy : MonoBehaviour
 
         animator.SetTrigger("death");
         audioSource.PlayOneShot(deathCry);
-        Destroy(gameObject, 0.4f); // Replace with animation/poof later
+        Destroy(gameObject, 0.64f); // Replace with animation/poof later
     }
 
     public virtual void ResetEnemy()
