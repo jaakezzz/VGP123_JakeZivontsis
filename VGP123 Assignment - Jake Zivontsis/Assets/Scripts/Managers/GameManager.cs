@@ -112,4 +112,39 @@ public class GameManager : MonoBehaviour
     {
         currentCheckpoint = spawnLocation;
     }
+
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "SampleScene")
+        {
+            CanvasManager cm = null;
+            foreach (GameObject go in scene.GetRootGameObjects())
+            {
+                cm = go.GetComponentInChildren<CanvasManager>(true);
+                if (cm != null) break;
+            }
+
+            if (cm != null)
+            {
+                canvasManager = cm;
+
+                if (playerInstance != null)
+                    playerInstance.SetCanvasManager(canvasManager);
+            }
+            else
+            {
+                Debug.LogWarning("CanvasManager not found in scene.");
+            }
+        }
+    }
 }

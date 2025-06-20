@@ -53,6 +53,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Time.timeScale <= 0) return;
 
         if (weapons[0] == true) animator.SetBool("sword", true);
 
@@ -179,6 +180,19 @@ public class PlayerController : MonoBehaviour
         {
             Destroy(collision.gameObject);
             arrowCount++;
+        }
+
+        if (collision.CompareTag("BossEnemy"))
+        {
+            if (canvasManager != null)
+            {
+                canvasManager.ShowWinScreen();
+                Time.timeScale = 0f;
+            }
+            else
+            {
+                Debug.LogWarning("CanvasManager not set on PlayerController.");
+            }
         }
     }
 

@@ -19,6 +19,7 @@ public class CanvasManager : MonoBehaviour
     public GameObject settingsCanvas;
     public GameObject pauseMenuCanvas;
     public GameObject HUDCanvas;
+    public GameObject WinCanvas;
 
     [Header("Text")]
     public TMP_Text volSliderText;
@@ -39,11 +40,17 @@ public class CanvasManager : MonoBehaviour
         if (backBtn)
         {
             if (SceneManager.GetActiveScene().name == "SampleScene")
-                backBtn.onClick.AddListener(() => SetMenus(HUDCanvas, pauseMenuCanvas));
+            {
+                backBtn.onClick.AddListener(() =>
+                {
+                    SetMenus(HUDCanvas, pauseMenuCanvas);
+                    Time.timeScale = 1.0f;
+                });
+            }
             else
                 backBtn.onClick.AddListener(() => SetMenus(mainMenuCanvas, settingsCanvas));
         }
-        if (mainMenuBtn) mainMenuBtn.onClick.AddListener(() => ChangeScene("Title"));
+        if (mainMenuBtn) mainMenuBtn.onClick.AddListener(ReturnToMenu);
 
         if (volSlider)
         {
@@ -58,7 +65,21 @@ public class CanvasManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (!pauseMenuCanvas) return;
+
+        if (Input.GetKeyUp(KeyCode.P))
+        {
+            if (pauseMenuCanvas.activeSelf)
+            {
+                SetMenus(HUDCanvas, pauseMenuCanvas);
+                Time.timeScale = 1.0f;
+            }
+            else
+            {
+                SetMenus(pauseMenuCanvas, HUDCanvas);
+                Time.timeScale = 0f;
+            }
+        }
     }
 
     public void ChangeScene(string sceneName)
@@ -94,4 +115,16 @@ public class CanvasManager : MonoBehaviour
             heartImages[i].sprite = i < currentHealth ? fullHeart : emptyHeart;
         }
     }
+
+    public void ShowWinScreen()
+    {
+        SetMenus(WinCanvas, HUDCanvas);
+    }
+
+    public void ReturnToMenu()
+    {
+        ChangeScene("Title");
+        Time.timeScale = 1.0f;
+    }
+
 }

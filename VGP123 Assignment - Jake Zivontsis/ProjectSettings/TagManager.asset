@@ -12,6 +12,7 @@ TagManager:
   - Hitbox3
   - Enemy
   - checkpointWall
+  - BossEnemy
   layers:
   - Default
   - TransparentFX
