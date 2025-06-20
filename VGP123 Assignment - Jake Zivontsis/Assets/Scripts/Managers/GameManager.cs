@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
 
     public UnityEvent<int> OnHealthChanged;
 
+    public CanvasManager canvasManager;
+
     #region Singleton Pattern
     private static GameManager _instance;
     public static GameManager Instance => _instance;
@@ -49,6 +51,9 @@ public class GameManager : MonoBehaviour
                 // play hurt sound
             }
             OnHealthChanged?.Invoke(playerHealth);
+            if (canvasManager != null)
+                canvasManager.UpdateHearts(playerHealth);
+
             Debug.Log("Player health: " + playerHealth);
         }
     }
@@ -96,6 +101,9 @@ public class GameManager : MonoBehaviour
     {
         playerInstance = Instantiate(playerPrefab, spawnLocation.position, Quaternion.identity);
         currentCheckpoint = spawnLocation;
+
+        if (canvasManager != null)
+            playerInstance.SetCanvasManager(canvasManager);
 
         OnPlayerControllerCreated?.Invoke(playerInstance);
     }

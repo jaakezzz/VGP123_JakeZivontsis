@@ -34,6 +34,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Collider2D hitbox2;
     [SerializeField] private Collider2D hitbox3;
 
+    [SerializeField] private CanvasManager canvasManager;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -140,6 +142,17 @@ public class PlayerController : MonoBehaviour
             transform.localScale = scale;
         }
 
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            if (healthPotions > 0)
+            {
+                healthPotions--;
+                GameManager.Instance.PlayerHealth = 3;
+                if (canvasManager != null)
+                    canvasManager.healthPotionsText.text = $"x{healthPotions}";
+            }
+        }
+
         animator.SetFloat("h-input", Mathf.Abs(hInput));
         animator.SetFloat("y-velocity", rb.linearVelocityY);
         animator.SetBool("grounded", groundCheck.IsGrounded);
@@ -152,6 +165,8 @@ public class PlayerController : MonoBehaviour
         {
             Destroy(collision.gameObject);
             healthPotions++;
+            if (canvasManager != null)
+                canvasManager.healthPotionsText.text = $"x{healthPotions}";
         }
 
         if (collision.CompareTag("Bow"))
@@ -232,5 +247,10 @@ public class PlayerController : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         GameManager.Instance.FinishRespawn();
+    }
+
+    public void SetCanvasManager(CanvasManager manager)
+    {
+        canvasManager = manager;
     }
 }
